@@ -10,6 +10,10 @@
         <wheel_separation>0.35</wheel_separation>
         <wheel_radius>0.05</wheel_radius>
 
+        <!-- Limits -->
+        <max_wheel_torque>200</max_wheel_torque>
+        <max_wheel_acceleration>10.0</max_wheel_acceleration>
+
         <!-- Input -->
         <topic>cmd_vel</topic>
 
@@ -18,6 +22,10 @@
         <child_frame_id>base_link</child_frame_id>
         <odom_topic>odom</odom_topic>            
         <tf_topic>tf</tf_topic>
+
+        <publish_odom>true</publish_odom>
+        <publish_odom_tf>true</publish_odom_tf>
+        <publish_wheel_tf>true</publish_wheel_tf>
 
         </plugin>
 

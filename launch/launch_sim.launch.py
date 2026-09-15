@@ -4,8 +4,9 @@ from ament_index_python.packages import get_package_share_directory
 
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node
 
@@ -22,8 +23,16 @@ def generate_launch_description():
     rsp = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory(package_name),'launch','rsp.launch.py'
-                )]), launch_arguments={'use_sim_time': 'true', 'use_ros2_control': 'false'}.items()
+                )]), launch_arguments={'use_sim_time': 'false', 'use_ros2_control': 'false'}.items()
     )
+
+    # world = LaunchConfiguration('world')
+
+    # world_arg = DeclareLaunchArgument(
+    #     'world',
+    #     default_value="empty.sdf",
+    #     description='World to load'
+    #     )
 
     joystick = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
@@ -55,13 +64,14 @@ def generate_launch_description():
     gazebo = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]),
-                    launch_arguments={'gz_args': f'-r {world_file}'}.items()
+                    launch_arguments={'gz_args': f'-r -s {world_file}'}.items()
              )
 
     # Spawn the robot into gz sim from the robot_description topic
     spawn_entity = Node(package='ros_gz_sim', executable='create',
                         arguments=['-topic', 'robot_description',
-                                   '-name', 'my_bot'],
+                                   '-name', 'my_bot',
+                                   '-z', '0.06'],
                         output='screen')
 
     # Bridge topics between ROS 2 and Gazebo Transport
@@ -80,7 +90,8 @@ def generate_launch_description():
     # Launch them all!
     return LaunchDescription([
         rsp,
-        joystick,
+        # world_arg,
+        # joystick,
         twist_mux,
         twist_stamper,
         gazebo,
